@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#534AB7">
+<title>Assessment de Evoluabilidade · Daniel Scharf</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F8F7F5; color: #1A1A18; min-height: 100vh; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .sub { font-size: 14px; color: #6B6B65; margin-bottom: 24px; }
+  .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 14px; border: 1px solid rgba(0,0,0,0.08); }
+  .dim-badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+  .prog { height: 4px; background: #E8E6E0; border-radius: 2px; margin: 12px 0 20px; }
+  .prog-fill { height: 100%; border-radius: 2px; transition: width .4s; }
+  .q-counter { font-size: 12px; color: #9B9B93; margin-bottom: 8px; }
+  .q-text { font-size: 17px; line-height: 1.55; color: #1A1A18; margin-bottom: 6px; }
+  .likert { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+  .l-btn { background: white; border: 1.5px solid #E0DED8; border-radius: 12px; padding: 13px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; color: #1A1A18; transition: all .12s; text-align: left; font-family: inherit; }
+  .l-btn:hover { border-color: #534AB7; background: #EEEDFE; }
+  .l-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; background: #F0EFE9; color: #6B6B65; }
+  .intro-icon { width: 64px; height: 64px; background: #EEEDFE; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 20px; }
+  .name-inp { width: 100%; border: 1.5px solid #E0DED8; border-radius: 10px; padding: 12px 14px; font-size: 15px; font-family: inherit; color: #1A1A18; background: #FAFAF8; margin-bottom: 16px; outline: none; }
+  .name-inp:focus { border-color: #534AB7; }
+  .btn-main { background: #534AB7; color: white; border: none; border-radius: 50px; padding: 15px 32px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; font-family: inherit; letter-spacing: .2px; }
+  .btn-sec { background: transparent; border: 1.5px solid #D0CEC8; border-radius: 50px; padding: 12px 24px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px; font-family: inherit; color: #6B6B65; }
+  .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .score-label { font-size: 14px; font-weight: 500; min-width: 140px; }
+  .score-bar { flex: 1; height: 8px; background: #E8E6E0; border-radius: 4px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 4px; }
+  .score-val { font-size: 14px; font-weight: 600; min-width: 36px; text-align: right; }
+  .pill { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 10px; }
+  .pill-hi { background: #EAF3DE; color: #3B6D11; }
+  .pill-md { background: #FAEEDA; color: #633806; }
+  .pill-lo { background: #FCEBEB; color: #501313; }
+  .idx-big { font-size: 48px; font-weight: 700; color: #534AB7; }
+  .radar-wrap { padding: 10px 0; }
+  canvas { display: block; margin: 0 auto; }
+  .print-btn { background: #1A1A18; color: white; border: none; border-radius: 50px; padding: 13px 28px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 12px; width: 100%; }
+  @media print { .btn-main, .btn-sec, .print-btn { display: none; } body { background: white; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script>
+const DIMS = [
+  { id:"meta", name:"Metacognição", color:"#534AB7",
+    qs:["Quando reajo de forma que não me agrada, consigo identificar rapidamente o que me levou a agir assim.","Percebo meus padrões de comportamento se repetindo em situações semelhantes.","Consigo observar meus próprios pensamentos enquanto estou em ação — não apenas depois.","Sei distinguir quando estou no meu estilo natural versus quando me adapto com esforço.","Após uma situação difícil, analiso o que aconteceu sem me culpar excessivamente."] },
+  { id:"mud", name:"Predisposição à Mudança", color:"#0F6E56",
+    qs:["Quando recebo feedback que contradiz minha autoimagem, consigo escutar sem me fechar defensivamente.","Já mudei comportamentos importantes em resposta a evidências claras, mesmo quando era desconfortável.","Consigo identificar como meus próprios comportamentos às vezes sabotam o que digo querer.","Distingo entre ajustes superficiais de comportamento e transformações mais profundas de padrão.","Não desisto de mudar quando os resultados demoram a aparecer."] },
+  { id:"sus", name:"Sustentação de Performance", color:"#D85A30",
+    qs:["Meu crescimento acontece em curvas sustentadas, não apenas em picos isolados seguidos de recaída.","Tenho rituais e práticas regulares que sustentam meu desenvolvimento, independente de motivação.","Mesmo em períodos de baixa motivação, mantenho consistência nos compromissos essenciais.","Consigo me recuperar e retomar o ritmo de desenvolvimento após períodos de dificuldade.","Invisto em prática deliberada e consciente, não apenas em exposição passiva a novos ambientes."] },
+  { id:"aut", name:"Autenticidade Operacional", color:"#BA7517",
+    qs:["As pessoas ao meu redor me conhecem como realmente sou — não como acho que preciso ser.","Quando estou no meu melhor, não preciso pensar em como me comportar — simplesmente ajo com naturalidade.","Sinto que posso ser eu mesmo nos ambientes profissionais mais importantes da minha vida.","Raramente me sinto esgotado de tanto me adaptar ao que o ambiente parece exigir de mim.","Meus valores pessoais e minha forma de agir no trabalho estão bem alinhados."] },
+  { id:"sal", name:"Potencial de Salto", color:"#185FA5",
+    qs:["Já dei saltos significativos de performance quando coloquei intenção, estrutura e prática deliberada.","Consigo imaginar com clareza uma versão de mim operando em um nível substancialmente superior ao atual.","Tenho exemplos concretos de situações em que superei o que eu mesmo achava que conseguiria.","Quando enfrento desafios novos e grandes, minha primeira reação tende a ser curiosidade, não paralisia.","Acredito que meu potencial atual é significativamente maior do que aquilo que estou entregando."] }
+];
+const LABELS=["Quase nunca","Raramente","Às vezes","Frequentemente","Quase sempre"];
+let screen="intro",name="",dim=0,q=0,ans={};
+
+function score(id){const a=ans[id];if(!a||!a.length)return 0;return Math.round(a.reduce((s,v)=>s+v,0)/a.length*20);}
+function level(s){if(s>=80)return{t:"Muito Alto",c:"pill-hi"};if(s>=65)return{t:"Alto",c:"pill-hi"};if(s>=45)return{t:"Médio",c:"pill-md"};return{t:"Em Desenvolvimento",c:"pill-lo"};}
+
+function render(){
+  const r=document.getElementById("root");
+  const total=Math.round(DIMS.reduce((s,d)=>s+score(d.id),0)/DIMS.length);
+  const done=dim*5+q;
+  const prog=Math.round(done/25*100);
+
+  if(screen==="intro"){
+    r.innerHTML=`<div class="card" style="text-align:center;padding:32px 20px">
+      <div class="intro-icon">⚡</div>
+      <h1>Assessment de Evoluabilidade</h1>
+      <p class="sub" style="margin-top:8px">Metodologia Daniel Scharf · 5 dimensões · 25 perguntas · ~8 minutos</p>
+      <p style="font-size:14px;color:#6B6B65;line-height:1.7;margin-bottom:24px">Mapeamento científico da sua capacidade de dar saltos de performance e sustentá-los ao longo do tempo.</p>
+      <input class="name-inp" id="n" placeholder="Seu nome (opcional)" value="${name}">
+      <button class="btn-main" onclick="startQ()">Iniciar assessment</button>
+    </div>`;
+    return;
+  }
+
+  if(screen==="q"){
+    const d=DIMS[dim];
+    r.innerHTML=`<div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:#9B9B93">Dimensão ${dim+1} de 5</span>
+        <span style="font-size:13px;color:#9B9B93">${done+1} / 25</span>
+      </div>
+      <div class="prog"><div class="prog-fill" style="width:${prog}%;background:${d.color}"></div></div>
+      <div class="card">
+        <div class="dim-badge" style="background:${d.color}22;color:${d.color}">${d.name}</div>
+        <div class="q-counter">Pergunta ${q+1} de 5</div>
+        <div class="q-text">${d.qs[q]}</div>
+        <div class="likert">
+          ${[1,2,3,4,5].map(n=>`<button class="l-btn" onclick="ans_(${n})">
+            <div class="l-num" style="${n>=4?`background:${d.color}22;color:${d.color}`:''}">
+              ${n}
+            </div>${LABELS[n-1]}</button>`).join("")}
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Results
+  const lv=level(total);
+  r.innerHTML=`<div class="card" style="text-align:center;margin-bottom:14px">
+      <p style="font-size:12px;color:#9B9B93;margin-bottom:4px">ÍNDICE DE EVOLUABILIDADE${name?" · "+name:""}</p>
+      <div class="idx-big">${total}<span style="font-size:20px;color:#9B9B93">/100</span></div>
+      <span class="pill ${lv.c}" style="font-size:13px;padding:4px 14px">${lv.t}</span>
+      <p style="font-size:13px;color:#6B6B65;margin-top:14px;line-height:1.6">${total>=75?"Base sólida de evoluabilidade. O processo pode avançar para intervenções estratégicas desde o início.":total>=50?"Evoluabilidade ativa — o processo chegou no momento certo. Primeiros 3 meses consolidam as dimensões de base.":"Evoluabilidade em construção. O processo de desenvolvimento será profundo e transformador."}</p>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;font-weight:600;color:#1A1A18;margin-bottom:16px">Por dimensão</p>
+      ${DIMS.map(d=>{const s=score(d.id);const lv2=level(s);return`<div class="score-row">
+        <div class="score-label" style="color:${d.color};font-size:13px">${d.name}</div>
+        <div class="score-bar"><div class="score-fill" style="width:${s}%;background:${d.color}"></div></div>
+        <div class="score-val" style="color:${d.color}">${s}</div>
+        <span class="pill ${lv2.c}">${lv2.t}</span>
+      </div>`;}).join("")}
+    </div>
+    <button class="print-btn" onclick="window.print()">Imprimir / Salvar PDF</button>
+    <button class="btn-sec" onclick="screen='intro';dim=0;q=0;ans={};render()">Fazer novamente</button>`;
+
+  // Save to localStorage
+  try{const s={};DIMS.forEach(d=>s[d.id]=score(d.id));localStorage.setItem("evoluabilidade",JSON.stringify({name,scores:s,total,date:new Date().toISOString()}));}catch(e){}
+}
+
+function startQ(){name=document.getElementById("n")?.value||"";screen="q";render();}
+function ans_(v){const id=DIMS[dim].id;ans[id]=[...(ans[id]||[]),v];if(q<4){q++;}else if(dim<4){dim++;q=0;}else{screen="result";}render();}
+render();
+</script>
+</body>
+</html>

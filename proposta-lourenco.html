@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta · Lourenço · Daniel Scharf</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F4F0; color: #1A1A18; min-height: 100vh; padding: 32px 16px; }
+  .page { max-width: 740px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 40px rgba(0,0,0,.08); }
+
+  /* HEADER */
+  .hdr { background: #534AB7; padding: 40px 48px 36px; color: white; display: flex; justify-content: space-between; align-items: flex-start; }
+  .hdr-left h1 { font-size: 26px; font-weight: 700; letter-spacing: -.3px; margin-bottom: 4px; }
+  .hdr-left .tagline { font-size: 13px; opacity: .75; font-weight: 400; }
+  .hdr-right { text-align: right; }
+  .hdr-right .label { font-size: 11px; opacity: .6; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
+  .hdr-right .client-name { font-size: 20px; font-weight: 600; }
+  .hdr-right .date { font-size: 12px; opacity: .65; margin-top: 4px; }
+
+  /* RIBBON */
+  .ribbon { background: #3C3489; padding: 14px 48px; display: flex; gap: 32px; }
+  .ribbon-item { font-size: 12px; color: rgba(255,255,255,.7); }
+  .ribbon-item strong { color: white; font-size: 13px; display: block; margin-bottom: 1px; }
+
+  /* BODY */
+  .body { padding: 40px 48px; }
+  .section { margin-bottom: 36px; }
+  .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #534AB7; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ""; flex: 1; height: 1px; background: #EEEDFE; }
+
+  /* CONTEXT BOX */
+  .context-box { background: #EEEDFE; border-radius: 12px; padding: 20px 24px; border-left: 4px solid #534AB7; }
+  .context-box p { font-size: 14px; line-height: 1.8; color: #3C3489; }
+  .context-box strong { color: #534AB7; }
+
+  /* PROCESS */
+  .process-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .proc-card { background: #FAFAF8; border: 1px solid #E8E6E0; border-radius: 12px; padding: 16px 18px; }
+  .proc-num { font-size: 11px; font-weight: 700; color: #534AB7; margin-bottom: 6px; }
+  .proc-title { font-size: 14px; font-weight: 600; color: #1A1A18; margin-bottom: 4px; }
+  .proc-desc { font-size: 12px; color: #6B6B65; line-height: 1.6; }
+
+  /* TIMELINE */
+  .timeline { display: flex; gap: 0; }
+  .tl-item { flex: 1; text-align: center; position: relative; }
+  .tl-item::after { content: ""; position: absolute; top: 16px; right: -50%; width: 100%; height: 1px; background: #E0DED8; z-index: 0; }
+  .tl-item:last-child::after { display: none; }
+  .tl-dot { width: 32px; height: 32px; border-radius: 50%; background: #534AB7; color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; position: relative; z-index: 1; }
+  .tl-label { font-size: 12px; font-weight: 600; color: #1A1A18; margin-bottom: 3px; }
+  .tl-sub { font-size: 11px; color: #9B9B93; }
+
+  /* LEVER */
+  .lever-box { background: linear-gradient(135deg, #534AB7, #3C3489); border-radius: 12px; padding: 22px 24px; color: white; }
+  .lever-label { font-size: 11px; opacity: .7; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+  .lever-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .lever-desc { font-size: 13px; opacity: .85; line-height: 1.7; }
+
+  /* INVESTMENT */
+  .inv-box { border: 2px solid #534AB7; border-radius: 16px; padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; }
+  .inv-left .period { font-size: 13px; color: #6B6B65; margin-bottom: 4px; }
+  .inv-left .value { font-size: 36px; font-weight: 700; color: #534AB7; letter-spacing: -1px; }
+  .inv-left .note { font-size: 12px; color: #9B9B93; margin-top: 4px; }
+  .inv-right { text-align: right; }
+  .inv-right .includes-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #9B9B93; margin-bottom: 8px; }
+  .inc-item { font-size: 13px; color: #1A1A18; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+  .inc-item::before { content: "✓"; color: #534AB7; font-weight: 700; }
+
+  /* NEXT STEPS */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+  .step { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: #FAFAF8; border-radius: 10px; border: 1px solid #E8E6E0; }
+  .step-n { width: 28px; height: 28px; border-radius: 50%; background: #534AB7; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-text { font-size: 14px; line-height: 1.6; color: #1A1A18; padding-top: 4px; }
+
+  /* FOOTER */
+  .footer { background: #1A1A18; padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-left p { font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.8; }
+  .footer-left strong { color: white; }
+  .footer-right .sign { font-size: 14px; font-weight: 600; color: white; }
+  .footer-right .sign-sub { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+  .print-btn { position: fixed; bottom: 24px; right: 24px; background: #534AB7; color: white; border: none; border-radius: 50px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 20px rgba(83,74,183,.4); font-family: inherit; }
+  @media print { .print-btn { display: none; } body { background: white; padding: 0; } .page { box-shadow: none; border-radius: 0; } }
+  @media (max-width: 600px) {
+    .hdr, .body, .footer { padding-left: 24px; padding-right: 24px; }
+    .ribbon { flex-wrap: wrap; gap: 16px; padding: 14px 24px; }
+    .process-grid { grid-template-columns: 1fr; }
+    .inv-box { flex-direction: column; gap: 20px; }
+    .inv-right { text-align: left; }
+    .inc-item { justify-content: flex-start; }
+    .hdr { flex-direction: column; gap: 16px; }
+    .hdr-right { text-align: left; }
+    .footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hdr">
+    <div class="hdr-left">
+      <h1>Daniel Scharf</h1>
+      <div class="tagline">Mentoria Estratégica · Gestão de Potencial · Evoluabilidade</div>
+    </div>
+    <div class="hdr-right">
+      <div class="label">Proposta para</div>
+      <div class="client-name">Lourenço</div>
+      <div class="date">Maio de 2026 · Confidencial</div>
+    </div>
+  </div>
+
+  <div class="ribbon">
+    <div class="ribbon-item"><strong>Processo inicial</strong>3 meses</div>
+    <div class="ribbon-item"><strong>Modalidade</strong>Individual · Presencial / Online</div>
+    <div class="ribbon-item"><strong>Início</strong>Imediato</div>
+    <div class="ribbon-item"><strong>Metodologia</strong>TTI Success Insights + Engenharia Comportamental</div>
+  </div>
+
+  <div class="body">
+
+    <div class="section">
+      <div class="section-title">Contexto</div>
+      <div class="context-box">
+        <p>Lourenço tem 27 anos, é da <strong>6ª geração da família Gerdau</strong> e está em um momento estratégico de vida: realizando um <strong>job rotation nas áreas core do negócio</strong> (comercial, industrial, metálicos e mineração) com o objetivo de construir uma visão 360° da empresa antes de tomar uma decisão de carreira.<br><br>
+        A decisão central — <strong>trajetória executiva ou atuação como acionista informado</strong> — precisa ser tomada até dezembro de 2026, com possibilidade de pós-graduação nos EUA (finanças/business) em 2027. Existe todo o potencial e o contexto ideal. O que o processo vai entregar é a <strong>clareza, o mapa e o método</strong> para transformar esse momento em resultado real.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">O que está incluído</div>
+      <div class="process-grid">
+        <div class="proc-card">
+          <div class="proc-num">01</div>
+          <div class="proc-title">Mapeamento Científico (TTI)</div>
+          <div class="proc-desc">Assessment TriMetrix DNA: motivadores internos, estilo comportamental e 25 competências. Relatório completo em PDF com devolutiva aprofundada.</div>
+        </div>
+        <div class="proc-card">
+          <div class="proc-num">02</div>
+          <div class="proc-title">Linha de Vida</div>
+          <div class="proc-desc">Análise dos picos altos e baixos de performance, bem-estar e entusiasmo. Cruzamento com os resultados do assessment para identificar o mapa de potencial.</div>
+        </div>
+        <div class="proc-card">
+          <div class="proc-num">03</div>
+          <div class="proc-title">Gestão do Potencial</div>
+          <div class="proc-desc">Identificação do ponto de alavanca e estruturação das ações da Engenharia Comportamental para desenvolvimento alinhado ao perfil natural.</div>
+        </div>
+        <div class="proc-card">
+          <div class="proc-num">04</div>
+          <div class="proc-title">Sessões Quinzenais</div>
+          <div class="proc-desc">6 encontros de desenvolvimento com metodologia de metacognição aplicada. Feedback contínuo, ajuste de rota e experimentação guiada.</div>
+        </div>
+        <div class="proc-card">
+          <div class="proc-num">05</div>
+          <div class="proc-title">Agente de IA entre Sessões</div>
+          <div class="proc-desc">Check-ins de desenvolvimento com inteligência artificial calibrada com o processo. Registro de aprendizados e avanços entre as sessões.</div>
+        </div>
+        <div class="proc-card">
+          <div class="proc-num">06</div>
+          <div class="proc-title">Canal Direto com Daniel</div>
+          <div class="proc-desc">Suporte contínuo via WhatsApp para dúvidas, provocações e ajustes durante o processo. Sem limite de sessões extras quando necessário.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Cronograma dos 3 meses</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot">1</div>
+          <div class="tl-label">Assessment</div>
+          <div class="tl-sub">TTI + Linha de vida</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">2</div>
+          <div class="tl-label">Devolutiva</div>
+          <div class="tl-sub">Mapa de potencial</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">3</div>
+          <div class="tl-label">Alavanca</div>
+          <div class="tl-sub">Comunicação</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">4</div>
+          <div class="tl-label">Ciclos</div>
+          <div class="tl-sub">Desenvolvimento</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">5</div>
+          <div class="tl-label">Fechamento</div>
+          <div class="tl-sub">Decisão de carreira</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Ponto de alavanca identificado</div>
+      <div class="lever-box">
+        <div class="lever-label">Baseado na sessão inicial</div>
+        <div class="lever-title">Comunicação e Posicionamento Assertivo</div>
+        <div class="lever-desc">Lourenço tem consciência elevada do seu lugar de fala, visão estratégica e capacidade natural de formar aliados — tudo pronto para ser amplificado. O trabalho é traduzir esse potencial em posicionamento claro, argumentação estruturada e presença consistente nos ambientes de alta visibilidade. Isso vai ser o veículo para a tomada de decisão de carreira até dezembro.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Investimento</div>
+      <div class="inv-box">
+        <div class="inv-left">
+          <div class="period">Ciclo inicial · 3 meses</div>
+          <div class="value">R$ 25.500</div>
+          <div class="note">Pix ou transferência · Parcelamento a combinar</div>
+        </div>
+        <div class="inv-right">
+          <div class="includes-label">Inclui</div>
+          <div class="inc-item">Assessment TTI TriMetrix DNA</div>
+          <div class="inc-item">Sessão de devolutiva (2h)</div>
+          <div class="inc-item">6 sessões de desenvolvimento</div>
+          <div class="inc-item">Agente de IA personalizado</div>
+          <div class="inc-item">Suporte WhatsApp contínuo</div>
+          <div class="inc-item">Relatórios em PDF</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Próximos passos</div>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-text"><strong>Confirmação do investimento</strong> — Pix ou transferência. Maria Aparecida envia os dados.</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-text"><strong>Envio do assessment TTI</strong> — Link de acesso por e-mail. Preenchimento online em ~20 minutos.</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-text"><strong>Sessão de devolutiva</strong> — Daniel analisa o relatório e cruza com os dados da sessão inicial. Agendamento a combinar com Maria.</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-text"><strong>Início dos ciclos quinzenais</strong> — Às 19h30, presencial (Leblon/Ipanema) ou online, conforme disponibilidade.</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">
+      <p><strong>Maria Aparecida</strong> · Assistente de Daniel Scharf<br>
+      (21) 99985-2135 · daniel@danielscharf.com.br<br>
+      danielscharf.com.br</p>
+    </div>
+    <div class="footer-right">
+      <div class="sign">Daniel Scharf</div>
+      <div class="sign-sub">Mentor · 15+ anos · TTI Certified</div>
+    </div>
+  </div>
+</div>
+
+<button class="print-btn" onclick="window.print()">Imprimir / Salvar PDF</button>
+</body>
+</html>

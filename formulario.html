@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aplicação para Mentoria · Daniel Scharf</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F8F7F5; color: #1A1A18; min-height: 100vh; }
+  .wrap { max-width: 600px; margin: 0 auto; padding: 24px 16px 60px; }
+  .hdr { margin-bottom: 28px; }
+  .brand { font-size: 12px; font-weight: 600; color: #534AB7; letter-spacing: .5px; text-transform: uppercase; margin-bottom: 4px; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .intro-text { font-size: 14px; color: #6B6B65; line-height: 1.7; }
+  .prog-segs { display: flex; gap: 4px; margin: 20px 0; }
+  .seg { flex: 1; height: 3px; background: #E0DED8; border-radius: 2px; }
+  .seg.done { background: #534AB7; }
+  .seg.cur { background: #AFA9EC; }
+  .sec-label { font-size: 11px; font-weight: 600; color: #534AB7; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 20px; }
+  .q-block { margin-bottom: 28px; }
+  .q-num { font-size: 11px; font-weight: 600; color: #534AB7; margin-bottom: 4px; }
+  .q-label { font-size: 16px; font-weight: 500; color: #1A1A18; margin-bottom: 4px; line-height: 1.5; }
+  .q-hint { font-size: 12px; color: #9B9B93; font-style: italic; margin-bottom: 10px; }
+  textarea { width: 100%; border: 1.5px solid #E0DED8; border-radius: 12px; padding: 12px 14px; font-size: 15px; font-family: inherit; color: #1A1A18; background: white; resize: vertical; min-height: 90px; outline: none; line-height: 1.6; transition: border-color .15s; }
+  textarea:focus { border-color: #534AB7; }
+  input[type=text] { width: 100%; border: 1.5px solid #E0DED8; border-radius: 12px; padding: 12px 14px; font-size: 15px; font-family: inherit; color: #1A1A18; background: white; outline: none; transition: border-color .15s; }
+  input:focus { border-color: #534AB7; }
+  .scale-opts { display: flex; flex-direction: column; gap: 8px; }
+  .scale-opt { background: white; border: 1.5px solid #E0DED8; border-radius: 12px; padding: 12px 16px; cursor: pointer; font-size: 14px; color: #1A1A18; transition: all .12s; text-align: left; font-family: inherit; }
+  .scale-opt.sel { border-color: #534AB7; background: #EEEDFE; color: #534AB7; font-weight: 500; }
+  .nav { display: flex; gap: 10px; margin-top: 12px; }
+  .btn-next { flex: 1; background: #534AB7; color: white; border: none; border-radius: 50px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .btn-next:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-back { flex: 0 0 auto; background: transparent; border: 1.5px solid #D0CEC8; border-radius: 50px; padding: 14px 20px; font-size: 15px; cursor: pointer; color: #6B6B65; font-family: inherit; }
+  .success { text-align: center; padding: 48px 24px; }
+  .success-icon { font-size: 48px; margin-bottom: 16px; }
+  .char { font-size: 11px; color: #9B9B93; text-align: right; margin-top: 3px; }
+  .req { color: #D85A30; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="brand">Aplicação para Mentoria Estratégica</div>
+    <h1>Daniel Scharf</h1>
+  </div>
+  <div id="root"></div>
+</div>
+<script>
+const SECS=[
+  { title:"Ponto de Partida", qs:[
+    {id:"q1",type:"text",req:true,num:"01",label:"Seu nome e função atual",hint:"Como prefere ser chamado e o que faz hoje."},
+    {id:"q2",type:"textarea",num:"02",label:"Em uma frase, como você descreveria quem você é hoje — além do que faz?",hint:"Não precisa ser perfeito. Espontaneidade vale mais que precisão."}
+  ]},
+  { title:"Momento e Contexto", qs:[
+    {id:"q3",type:"textarea",req:true,num:"03",label:"O que está mais vivo, confuso ou urgente na sua vida agora — profissional e pessoalmente?",hint:"Não filtre. Escreva o que vier primeiro."},
+    {id:"q4",type:"textarea",num:"04",label:"Quais decisões você precisa tomar, mas ainda não tomou? O que tem impedido?",hint:"Pode ser algo simples ou algo grande — o tamanho não importa."}
+  ]},
+  { title:"Potencial e Bloqueios", qs:[
+    {id:"q5",type:"textarea",req:true,num:"05",label:"Quais situações recentes em que você se sentiu no seu melhor — em que você se destacou?",hint:"Pode ser uma reunião, conversa, projeto ou momento pessoal."},
+    {id:"q6",type:"textarea",num:"06",label:"O que você percebe que se repete — um padrão seu que, no fundo, limita ou atrasa você?",hint:"Seja honesto. Não existe resposta errada aqui."}
+  ]},
+  { title:"Visão e Expectativas", qs:[
+    {id:"q7",type:"textarea",req:true,num:"07",label:"Onde você se imagina daqui a 12 meses — em vida, carreira e quem quer ser?",hint:"Não precisa ser realista. Escreva o que realmente quer."},
+    {id:"q8",type:"scale",num:"08",label:"Em que nível você se sente pronto para um processo de desenvolvimento intenso — com desafios reais e feedbacks honestos?",
+      opts:["1 — Não sei se estou pronto","2 — Com algumas ressalvas","3 — Moderadamente pronto","4 — Bem pronto","5 — Completamente pronto"]},
+    {id:"q9",type:"textarea",req:true,num:"09",label:"Qual seria a evidência concreta de que este processo valeu muito a pena?",hint:"Uma situação, um comportamento, um resultado que hoje é difícil e que você quer que seja natural."},
+    {id:"q10",type:"textarea",num:"10",label:"Algo que quer me contar antes de começarmos — que acha importante eu saber sobre você?",hint:"Pode ser qualquer coisa: um contexto, uma preocupação, uma história."}
+  ]}
+];
+
+let sec=0,ans={},done=false;
+
+function canNext(){
+  return SECS[sec].qs.filter(q=>q.req).every(q=>{const a=ans[q.id];return a&&(typeof a==="string"?a.trim().length>0:true);});
+}
+
+function setAns(id,val){ans[id]=val;render();}
+
+function render(){
+  const r=document.getElementById("root");
+  if(done){
+    r.innerHTML=`<div class="success">
+      <div class="success-icon">✅</div>
+      <h2 style="font-size:20px;margin-bottom:10px">Aplicação recebida!</h2>
+      <p style="color:#6B6B65;font-size:15px;line-height:1.7">Suas respostas foram registradas com sucesso. O Daniel vai analisá-las antes da nossa sessão de devolutiva.</p>
+      <p style="color:#9B9B93;font-size:13px;margin-top:20px">daniel@danielscharf.com.br · (21) 99985-2135</p>
+    </div>`;
+    return;
+  }
+  const s=SECS[sec];
+  const segsHTML=SECS.map((_,i)=>`<div class="seg ${i<sec?"done":i===sec?"cur":""}"></div>`).join("");
+  const qs=s.qs.map(q=>{
+    const v=ans[q.id]||"";
+    let inp="";
+    if(q.type==="text") inp=`<input type="text" value="${v}" oninput="setAns('${q.id}',this.value)" placeholder="Sua resposta...">`;
+    else if(q.type==="textarea") inp=`<textarea oninput="setAns('${q.id}',this.value)" placeholder="Escreva aqui...">${v}</textarea><div class="char">${v.length} caracteres</div>`;
+    else if(q.type==="scale") inp=`<div class="scale-opts">${q.opts.map((o,i)=>`<button class="scale-opt ${v===i+1?'sel':''}" onclick="setAns('${q.id}',${i+1})">${o}</button>`).join("")}</div>`;
+    return `<div class="q-block">
+      <div class="q-num">Pergunta ${q.num}${q.req?`<span class="req"> *</span>`:""}</div>
+      <div class="q-label">${q.label}</div>
+      ${q.hint?`<div class="q-hint">${q.hint}</div>`:""}
+      ${inp}
+    </div>`;
+  }).join("");
+  r.innerHTML=`<div class="prog-segs">${segsHTML}</div>
+    <div class="sec-label">Seção ${sec+1} de ${SECS.length} — ${s.title}</div>
+    ${qs}
+    <div class="nav">
+      ${sec>0?`<button class="btn-back" onclick="sec--;render()">← Voltar</button>`:""}
+      ${sec<SECS.length-1
+        ?`<button class="btn-next" onclick="sec++;render()" ${canNext()?"":"disabled"}>Próxima seção →</button>`
+        :`<button class="btn-next" onclick="submit()" ${canNext()?"":"disabled"}>Enviar para Daniel</button>`}
+    </div>`;
+}
+
+function submit(){
+  try{localStorage.setItem("formulario_aplicacao",JSON.stringify({ans,date:new Date().toISOString()}));}catch(e){}
+  done=true;render();
+}
+render();
+</script>
+</body>
+</html>
