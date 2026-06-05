@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Evoluabilidade™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;600;700;900&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:      #2D2A5E; --purple-tint: #E3E2EF;
+  --off-white:   #FAF9F6; --paper: #FFFFFF;
+  --bone:        #F1EEE7; --hairline: #E5E2DA; --hairline-s: #C9C4B6;
+  --ink:         #15132F; --ink-2: #3D3A5C; --ink-3: #6E6A85; --ink-4: #A09DB1;
+  --orange:      #E8734A; --orange-deep: #C25530; --orange-soft: #FAD7C6;
+  --success:     #1F8A5B; --warn: #B58B2C; --danger: #C2412A;
+  --font-serif:  'Instrument Serif', Georgia, serif;
+  --font-ui:     'Inter Tight', sans-serif;
+  --font-body:   'Inter', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--off-white); color: var(--ink); font-family: var(--font-body); font-size: 14px; min-height: 100vh; }
+
+/* Layout */
+.shell { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+.header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--hairline); }
+.logo { display: flex; align-items: center; gap: 8px; }
+.logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--orange); }
+.logo-name { font-family: var(--font-ui); font-weight: 700; font-size: 18px; color: var(--purple); }
+.logo-tag  { font-family: var(--font-ui); font-size: 11px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* Stats bar */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.stat { background: var(--paper); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px; }
+.stat-val { font-family: var(--font-ui); font-weight: 900; font-size: 28px; color: var(--purple); margin-bottom: 4px; }
+.stat-label { font-family: var(--font-ui); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+
+/* Search bar */
+.toolbar { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+.search-input {
+  flex: 1; min-width: 200px;
+  border: 1px solid var(--hairline-s); border-radius: 6px;
+  padding: 8px 12px; font-family: var(--font-body); font-size: 13px;
+  background: var(--paper); color: var(--ink); outline: none;
+}
+.search-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-tint); }
+.btn { font-family: var(--font-ui); font-weight: 700; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; padding: 8px 16px; border-radius: 999px; border: none; cursor: pointer; transition: all 120ms; }
+.btn-primary { background: var(--orange); color: white; }
+.btn-primary:hover { background: var(--orange-deep); }
+.btn-sm { padding: 4px 12px; font-size: 10px; background: var(--purple-tint); color: var(--purple); border: none; border-radius: 999px; cursor: pointer; text-decoration: none; font-family: var(--font-ui); font-weight: 700; }
+.btn-sm:hover { background: var(--purple); color: white; }
+
+/* Table */
+.table-wrap { background: var(--paper); border: 1px solid var(--hairline); border-radius: 10px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--bone); }
+th {
+  padding: 10px 14px; text-align: left;
+  font-family: var(--font-ui); font-weight: 600; font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3);
+}
+td { padding: 12px 14px; border-top: 1px solid var(--hairline); font-size: 13px; vertical-align: middle; }
+tr:hover td { background: var(--bone); }
+
+.qoe-pill {
+  font-family: var(--font-ui); font-weight: 700; font-size: 12px;
+  padding: 2px 10px; border-radius: 999px; display: inline-block;
+}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+/* Loading */
+.empty { text-align: center; padding: 64px 24px; color: var(--ink-3); }
+.empty .icon { font-size: 32px; margin-bottom: 12px; }
+.loading-row td { color: var(--ink-4); font-style: italic; text-align: center; padding: 40px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <div class="logo" style="margin-bottom:4px">
+        <div class="logo-dot"></div>
+        <span class="logo-name">Evoluabilidade™</span>
+      </div>
+      <div class="logo-tag">Dashboard · Admin</div>
+    </div>
+    <div style="text-align:right">
+      <div id="header-data" style="font-size:12px;color:var(--ink-3)">—</div>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="st-total">—</div>
+      <div class="stat-label">Assessments</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="st-qoe">—</div>
+      <div class="stat-label">QoE Médio</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="st-hoje">—</div>
+      <div class="stat-label">Hoje</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="st-semana">—</div>
+      <div class="stat-label">Esta semana</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <input type="text" class="search-input" id="search" placeholder="Buscar por nome ou e-mail…" oninput="filtrar()">
+    <select id="filtro-par" onchange="filtrar()" style="border:1px solid var(--hairline-s);border-radius:6px;padding:8px 10px;font-family:var(--font-body);font-size:13px;background:var(--paper);color:var(--ink);outline:none">
+      <option value="">Todos os pares</option>
+      <option>1×1</option><option>2×2</option><option>3×3</option><option>4×4</option><option>5×5</option>
+    </select>
+    <button class="btn btn-primary" onclick="carregar()">↺ Atualizar</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>#</th>
+        <th>Nome</th>
+        <th>E-mail</th>
+        <th>QoE</th>
+        <th>Par</th>
+        <th>Data</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr></thead>
+      <tbody id="tbody">
+        <tr class="loading-row"><td colspan="8">Carregando assessments…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:12px;font-size:11px;color:var(--ink-4);text-align:right">
+    Dados do Airtable · Assessment de Evoluabilidade™ · Instrumento em fase beta
+  </div>
+</div>
+
+<script>
+let todos = [];
+
+function nivelQoE(q){
+  if(q>=70) return { label:'Propulsor', bg:'rgba(31,138,91,0.1)', color:'#1F8A5B' };
+  if(q>=50) return { label:'Atenção',   bg:'rgba(181,139,44,0.1)', color:'#B58B2C' };
+  return { label:'Teto', bg:'rgba(194,65,42,0.1)', color:'#C2412A' };
+}
+function fmtData(iso){
+  try { return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+  catch{ return '—'; }
+}
+function filtrar(){
+  const q = document.getElementById('search').value.toLowerCase();
+  const par = document.getElementById('filtro-par').value;
+  const filtrado = todos.filter(r =>
+    (!q || r.nome.toLowerCase().includes(q) || r.email.toLowerCase().includes(q)) &&
+    (!par || r.par === par)
+  );
+  renderTabela(filtrado);
+}
+function renderTabela(lista){
+  const tbody = document.getElementById('tbody');
+  if(!lista.length){
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="8">Nenhum resultado encontrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map((r,i) => {
+    const n = nivelQoE(r.QoE);
+    const statusColor = r.status==='completo' ? '#1F8A5B' : '#B58B2C';
+    return `<tr>
+      <td style="color:var(--ink-3);font-size:11px">${i+1}</td>
+      <td><strong>${r.nome}</strong></td>
+      <td style="color:var(--ink-3)">${r.email}</td>
+      <td>
+        <span class="qoe-pill" style="background:${n.bg};color:${n.color}">${r.QoE} · ${n.label}</span>
+      </td>
+      <td><span style="font-family:var(--font-ui);font-weight:700;font-size:11px;color:var(--purple)">${r.par}</span></td>
+      <td style="color:var(--ink-3);font-size:12px">${fmtData(r.data)}</td>
+      <td><span class="status-dot" style="background:${statusColor}"></span>${r.status}</td>
+      <td>
+        <a href="/relatorio.html?id=${r.id}" target="_blank" class="btn-sm">Ver relatório</a>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function carregar(){
+  document.getElementById('tbody').innerHTML = '<tr class="loading-row"><td colspan="8">Carregando…</td></tr>';
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get('key') || '';
+    const r = await fetch(`/api/lista${key ? '?key='+key : ''}`);
+    const data = await r.json();
+    if(!r.ok) throw new Error(data.error);
+    todos = data.records || [];
+    
+    // Stats
+    document.getElementById('st-total').textContent = todos.length;
+    const qoes = todos.filter(r=>r.QoE>0).map(r=>r.QoE);
+    document.getElementById('st-qoe').textContent = qoes.length ? Math.round(qoes.reduce((a,b)=>a+b,0)/qoes.length) : '—';
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const semana = new Date(); semana.setDate(semana.getDate()-7);
+    document.getElementById('st-hoje').textContent = todos.filter(r=>r.data && new Date(r.data)>=hoje).length;
+    document.getElementById('st-semana').textContent = todos.filter(r=>r.data && new Date(r.data)>=semana).length;
+    document.getElementById('header-data').textContent = `Atualizado às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+
+    renderTabela(todos);
+  } catch(e){
+    document.getElementById('tbody').innerHTML = `<tr class="loading-row"><td colspan="8" style="color:var(--danger)">Erro: ${e.message}</td></tr>`;
+  }
+}
+carregar();
+</script>
+</body>
+</html>
